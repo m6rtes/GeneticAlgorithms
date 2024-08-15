@@ -4,11 +4,11 @@ import random
 
 genes = [0,1,2,3,4,5,6,7,8,9]
 
-points = [0,1,2,3,4,5,6,7,8,9,0,1,2,3,6,10,12,14,16,27]
+points = [[0,1,2,3,4,5,6,7,8,9],[-5,-3,-1,0,1,3,5,7,9,15]]
 
 POPULATION_SIZE = 100
-MUTATION_PROB = 0.5
-INDIVIDUAL_SIZE = 7
+MUTATION_PROB = 0.05
+INDIVIDUAL_SIZE = 6
 
 def createIndividual():
     array = []
@@ -26,7 +26,9 @@ def initialize_Population(size):
 def calculate_fitness(individual):
     fitness = 0
     for i in range(0,len(individual)):
-        fitness += max(genes)-individual[i]
+        if individual[i] in points[0]:
+            fitness += points[1][points[0].index(individual[i])]
+    fitness = fitness * 100 / (points[1][-1]*INDIVIDUAL_SIZE)
     return fitness
 
 def createOffsprings(parent1, parent2):
@@ -53,10 +55,10 @@ running = True
 
 while running:
     #Sort them by fitness
-    sorted_population = sorted(population, key=lambda ind: ind[1])
+    sorted_population = sorted(population, key=lambda ind: ind[1], reverse=True)
 
     #When most optimal is found
-    if sorted_population[0][1] <= 0:
+    if sorted_population[0][1] >= 100:
         running = False
         break
 
