@@ -1,79 +1,81 @@
+#OBJECTIVE: MAKE AN INDIVIDUAL WITH THE MAX NUMBER PRESENT IN 'GENES' IN EVERY ONE OF ITS POSITIONS
+
 import random
 
-deck =(2,3,4,5,6,7,8,9,10,10,10,10,11) # main deck tuple including aces (aces become 1 if user > 21)
-dealer_hand = [] # dealer list to hold cars
-user_hand = [] # user list to hold cards
-    
-def draw(): # function that will be called to draw a random card from the deck
-    new_card = random.choice(deck)
-    return new_card
+genes = [0,1,2,3,4,5,6,7,8,9]
 
-def dealer_draw(user_total):
-    if user_total < 21:
-        while sum(dealer_hand) < 17:
-            dealer_hand.append(draw())
-    return dealer_hand
+points = [0,1,2,3,4,5,6,7,8,9,0,1,2,3,6,10,12,14,16,27]
 
-def blackjack(): # game fuction
-    for i in range(2): # for loop to draw 2 cards to both the user and dealer
-        user_hand.append(draw())
-        dealer_hand.append(draw())
-        
-    print(f'User has: {user_hand}')
-    print(f'Dealer has: {dealer_hand}')
-    
-    continue_game = True # will be used to terminate while loop
-    
-    while continue_game == True and sum(user_hand) < 21:
-        drawing = input("Would you like to draw another card (y/n)       : ").lower()
-        
-        if drawing == 'y': # if users types y, it draws another card
-            user_hand.append(draw())
-            
-            if 11 in user_hand and sum(user_hand) > 21: # aces (11's) get converted to 1's if > 21
-                user_hand.remove(11)
-                user_hand.append(1)
-                
-            print(f'User now has has: {user_hand}')
-            print(f'Dealer has: {dealer_hand}')
-            
+POPULATION_SIZE = 100
+MUTATION_PROB = 0.5
+INDIVIDUAL_SIZE = 7
+
+def createIndividual():
+    array = []
+    for i in range(0,INDIVIDUAL_SIZE):
+        array.append(random.choice(genes))
+    fitness = calculate_fitness(array)
+    return(array,fitness)
+
+def initialize_Population(size):
+    population = []
+    for i in range(0,size):
+        population.append(createIndividual())
+    return population
+
+def calculate_fitness(individual):
+    fitness = 0
+    for i in range(0,len(individual)):
+        fitness += max(genes)-individual[i]
+    return fitness
+
+def createOffsprings(parent1, parent2):
+    child = []
+    parent1_choices = parent1[0][int((INDIVIDUAL_SIZE/2)-1):int((INDIVIDUAL_SIZE-(INDIVIDUAL_SIZE/2)-1))]
+    parent2_choices = parent2[0][0:int((INDIVIDUAL_SIZE/2)-1)].extend(parent2[0][int(INDIVIDUAL_SIZE-(INDIVIDUAL_SIZE/2)-1):INDIVIDUAL_SIZE])
+    for i in range(0,INDIVIDUAL_SIZE):
+        prob=random.random()
+        if prob+1 >= 1-MUTATION_PROB:
+            child.append(random.choice(genes))
+        elif i<(INDIVIDUAL_SIZE/2):
+            child.append(random.choice(parent1_choices))
         else:
-            continue_game = False        
-        
-    dealer_draw(sum(user_hand)) # Function to draw card for dealer (if necessary)
-                              
-    print("~~~~~~ Final results ~~~~~~")
-    print(f"User has {user_hand} for a total of {sum(user_hand)}")
-    print(f"Dealer has {dealer_hand} for a total of {sum(dealer_hand)}")
+            child.append(random.choice(parent2_choices))
+    fitness = calculate_fitness(child)
+    return(child,fitness)        
+
+
+#Get initial population
+gen = 1
+population = initialize_Population(POPULATION_SIZE)
+
+running = True
+
+while running:
+    #Sort them by fitness
+    sorted_population = sorted(population, key=lambda ind: ind[1])
+
+    #When most optimal is found
+    if sorted_population[0][1] <= 0:
+        running = False
+        break
+
+    new_gen = []
+
+    #Pass 5% of previous generation to new generation
+    five_percent = int((POPULATION_SIZE*10)/100)
+    new_gen.extend(sorted_population[:five_percent])
+
+    #Fill other 90% of new generation with offsprings between best 40% of population
+    ninety_percent = int((POPULATION_SIZE*90)/100)
+    for i in range(0,ninety_percent):
+        child = createOffsprings(random.choice(sorted_population[:40]), random.choice(sorted_population[:40]))
+        new_gen.append(child)
     
-    if sum(user_hand) > 21: #if statements check for bust, then draws, then checks for values between user/dealer 
-        print("User busts! Dealer wins")
-    elif sum(user_hand) == sum(dealer_hand):
-        print("Draw")
-    elif sum(dealer_hand) > sum(user_hand) and sum(dealer_hand) <= 21:
-        print("Dealer wins")
-    else:
-        print("User wins")
-    
+    population = new_gen
 
-# Main Game
-print('________________________')
-print("                      Welcome to Blackjack           ")
-print("Blackjack is a card game where the user goes against the dealer.")
-print("Your Goal is to draw cards to get closest to 21 points,")
-print("however you don't want to go above 21 points because you will lose!")
+    print(f"Generation: {gen}   Individual: {population[0][0]}  Fitness: {population[0][1]}")
+    gen += 1    #Next generation
 
+print(f"Generation: {gen}   Individual: {sorted_population[0][0]}  Fitness: {sorted_population[0][1]}")
 
-play_game = False
-while play_game == False:
-    play = input("          Would you like to play?     (y/n)       :       ").lower()
-
-    if play == "y":
-        blackjack()
-        play_game = True
-    elif play == "n":
-        print('_____________________')
-        print("Goodbye")
-        play_game = True
-    else:
-        print("You did not enter either 'y' or 'n'.")
