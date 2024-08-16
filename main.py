@@ -10,7 +10,7 @@ genes = [0,1,2,3,4,5,6,7,8,9]
 points = [[0,1,2,3,4,5,6,7,8,9],[-5,-3,-1,0,1,3,5,7,9,15]]
 
 POPULATION_SIZE = 100
-MUTATION_PROB = 0.05
+MUTATION_PROB = 0.05 # 1-0
 INDIVIDUAL_SIZE = 6
 
 def createIndividual():
@@ -68,12 +68,12 @@ while running:
     new_gen = []
 
     #Pass 5% of previous generation to new generation
-    five_percent = int((POPULATION_SIZE*10)/100)
+    five_percent = int((POPULATION_SIZE*5)/100)
     new_gen.extend(sorted_population[:five_percent])
 
     #Fill other 90% of new generation with offsprings between best 40% of population
-    ninety_percent = int((POPULATION_SIZE*90)/100)
-    for i in range(0,ninety_percent):
+    ninetyfive_percent = int((POPULATION_SIZE*95)/100)
+    for i in range(0,ninetyfive_percent):
         child = createOffsprings(random.choice(sorted_population[:40]), random.choice(sorted_population[:40]))
         new_gen.append(child)
     
