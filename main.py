@@ -6,9 +6,9 @@ genes = [0,1,2,3,4,5,6,7,8,9]
 
 points = [[0,1,2,3,4,5,6,7,8,9],[-5,-3,-1,0,1,3,5,7,9,15]]
 
-POPULATION_SIZE = 100
-MUTATION_PROB = 0.05
-INDIVIDUAL_SIZE = 6
+POPULATION_SIZE = 1000
+mutation_prob = 0.25
+INDIVIDUAL_SIZE = 5
 
 def createIndividual():
     array = []
@@ -37,7 +37,7 @@ def createOffsprings(parent1, parent2):
     parent2_choices = parent2[0][0:int((INDIVIDUAL_SIZE/2)-1)].extend(parent2[0][int(INDIVIDUAL_SIZE-(INDIVIDUAL_SIZE/2)-1):INDIVIDUAL_SIZE])
     for i in range(0,INDIVIDUAL_SIZE):
         prob=random.random()
-        if prob+1 >= 1-MUTATION_PROB:
+        if prob+1 >= 1-mutation_prob:
             child.append(random.choice(genes))
         elif i<(INDIVIDUAL_SIZE/2):
             child.append(random.choice(parent1_choices))
@@ -50,6 +50,8 @@ def createOffsprings(parent1, parent2):
 #Get initial population
 gen = 1
 population = initialize_Population(POPULATION_SIZE)
+last_fitness = 0
+count = 0
 
 running = True
 
@@ -74,9 +76,21 @@ while running:
         child = createOffsprings(random.choice(sorted_population[:40]), random.choice(sorted_population[:40]))
         new_gen.append(child)
     
+    if last_fitness == population[0][1]:
+        count += 1
+
+    if count == 10:
+        mutation_prob += 0.1
+        count = 0
+        
+        if mutation_prob > 0.5:
+            mutation_prob = 0.1
+
     population = new_gen
 
-    print(f"Generation: {gen}   Individual: {population[0][0]}  Fitness: {population[0][1]}")
+    last_fitness = population[0][1]
+
+    print(f"Generation: {gen}   Individual: {population[0][0]}  Fitness: {population[0][1]} Mutation Probability: {mutation_prob}")
     gen += 1    #Next generation
 
 print(f"Generation: {gen}   Individual: {sorted_population[0][0]}  Fitness: {sorted_population[0][1]}")
