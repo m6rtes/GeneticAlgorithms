@@ -1,4 +1,4 @@
-# OBJECTIVE: MAKE AN INDIVIDUAL WITH THE MAX NUMBER PRESENT IN 'GENES' IN EVERY ONE OF ITS POSITIONS
+#OBJECTIVE: MAKE AN INDIVIDUAL WITH THE MAX NUMBER PRESENT IN 'GENES' IN EVERY ONE OF ITS POSITIONS
 # Fernanda Granados Monge A01252895
 # Martín Gerardo Tánori Sitten A01252900
 # Santiago Eduardo Poblete Talamante A01254609
@@ -71,18 +71,16 @@ while running:
     new_gen = []
 
     #Pass 5% of previous generation to new generation
-    five_percent = int((POPULATION_SIZE*5)/100)
+    five_percent = int((POPULATION_SIZE*10)/100)
     new_gen.extend(sorted_population[:five_percent])
 
     #Fill other 90% of new generation with offsprings between best 40% of population
-    ninetyfive_percent = int((POPULATION_SIZE*95)/100)
-    for i in range(0,ninetyfive_percent):
+    ninety_percent = int((POPULATION_SIZE*90)/100)
+    for i in range(0,ninety_percent):
         child = createOffsprings(random.choice(sorted_population[:40]), random.choice(sorted_population[:40]))
         new_gen.append(child)
 
     population = new_gen
-
-    last_fitness = population[0][1]
 
     print(f"Generation: {gen}   Individual: {population[0][0]}  Fitness: {population[0][1]}")
     gen += 1    #Next generation
