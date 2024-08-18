@@ -4,11 +4,11 @@ import random
 
 genes = [0,1,2,3,4,5,6,7,8,9]
 
-points = [[0,1,2,3,4,5,6,7,8,9],[-5,-3,-1,0,1,3,5,7,9,15]]
+points = [[0,1,2,3,4,5,6,7,8,9],[-15,-12,-13,-11,-9,-7,1,3,5,15]]
 
-POPULATION_SIZE = 1000
-mutation_prob = 0.25
-INDIVIDUAL_SIZE = 5
+POPULATION_SIZE = 10
+MUTATION_PROB = 0
+INDIVIDUAL_SIZE = 6
 
 def createIndividual():
     array = []
@@ -33,18 +33,19 @@ def calculate_fitness(individual):
 
 def createOffsprings(parent1, parent2):
     child = []
-    parent1_choices = parent1[0][int((INDIVIDUAL_SIZE/2)-1):int((INDIVIDUAL_SIZE-(INDIVIDUAL_SIZE/2)-1))]
-    parent2_choices = parent2[0][0:int((INDIVIDUAL_SIZE/2)-1)].extend(parent2[0][int(INDIVIDUAL_SIZE-(INDIVIDUAL_SIZE/2)-1):INDIVIDUAL_SIZE])
+    parent1_choices = parent1[0][int((INDIVIDUAL_SIZE/2)-1):int((INDIVIDUAL_SIZE-((INDIVIDUAL_SIZE/2)-1)))]
+    parent2_choices = parent2[0][0:int((INDIVIDUAL_SIZE/2)-1)] + parent2[0][int(INDIVIDUAL_SIZE-((INDIVIDUAL_SIZE/2)-1)):INDIVIDUAL_SIZE]
     for i in range(0,INDIVIDUAL_SIZE):
         prob=random.random()
-        if prob+1 >= 1-mutation_prob:
+        if prob >= 1-MUTATION_PROB:
             child.append(random.choice(genes))
         elif i<(INDIVIDUAL_SIZE/2):
             child.append(random.choice(parent1_choices))
         else:
             child.append(random.choice(parent2_choices))
     fitness = calculate_fitness(child)
-    return(child,fitness)        
+    return(child,fitness)
+
 
 
 #Get initial population
@@ -75,22 +76,12 @@ while running:
     for i in range(0,ninety_percent):
         child = createOffsprings(random.choice(sorted_population[:40]), random.choice(sorted_population[:40]))
         new_gen.append(child)
-    
-    if last_fitness == population[0][1]:
-        count += 1
-
-    if count == 10:
-        mutation_prob += 0.1
-        count = 0
-        
-        if mutation_prob > 0.5:
-            mutation_prob = 0.1
 
     population = new_gen
 
     last_fitness = population[0][1]
 
-    print(f"Generation: {gen}   Individual: {population[0][0]}  Fitness: {population[0][1]} Mutation Probability: {mutation_prob}")
+    print(f"Generation: {gen}   Individual: {population[0][0]}  Fitness: {population[0][1]}")
     gen += 1    #Next generation
 
 print(f"Generation: {gen}   Individual: {sorted_population[0][0]}  Fitness: {sorted_population[0][1]}")
